@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Install Node.js dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Run backend tests
+      run: |
+        python -m pytest
+
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm run test
+
+    - name: Lint Python code
+      run: |
+        pip install flake8
+        flake8 .
+
+    - name: Lint TypeScript code
+      run: |
+        cd frontend
+        npm run lint
+
+    - name: Build frontend assets
+      run: |
+        cd frontend
+        npm run build
+
+# HUMAN ASSISTANCE NEEDED
+# Please review the following:
+# 1. Ensure that the Python and Node.js versions are correct for your project.
+# 2. Verify that the paths to requirements.txt and frontend directory are correct.
+# 3. Confirm that the test commands (pytest for backend, npm run test for frontend) are appropriate for your project setup.
+# 4. Check if additional environment variables or secrets are needed for the CI process.
